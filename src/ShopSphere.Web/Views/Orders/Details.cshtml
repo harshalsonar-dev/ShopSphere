@@ -1,0 +1,116 @@
+@model OrderDto
+@{
+    ViewData["Title"] = $"Order #{Model.Id} Details";
+
+    var isPending = Model.OrderStatus == OrderStatus.Pending;
+    var isProcessing = Model.OrderStatus == OrderStatus.Processing;
+    var isShipped = Model.OrderStatus == OrderStatus.Shipped;
+    var isDelivered = Model.OrderStatus == OrderStatus.Delivered;
+    var isCancelled = Model.OrderStatus == OrderStatus.Cancelled;
+}
+
+<div class="row justify-content-center py-3">
+    <div class="col-lg-9">
+        <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5 bg-white">
+            <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+                <div>
+                    <h3 class="fw-bold mb-0">Order #@Model.Id</h3>
+                    <small class="text-muted">Placed on @Model.CreatedAt.ToString("f") UTC</small>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <span class="badge @(isCancelled ? "bg-danger" : isDelivered ? "bg-success" : "bg-primary") fs-6 px-3 py-2 rounded-pill">
+                        @Model.OrderStatusName
+                    </span>
+                    @if (isPending || isProcessing)
+                    {
+                        <form method="post" asp-action="Cancel" asp-route-id="@Model.Id" class="d-inline">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-outline-danger btn-sm" onclick="return confirm('Are you sure you want to cancel this order? Stock will be restocked.');">
+                                <i class="bi bi-x-circle me-1"></i> Cancel Order
+                            </button>
+                        </form>
+                    }
+                </div>
+            </div>
+
+            <!-- Visual Status Progression Bar -->
+            @if (!isCancelled)
+            {
+                <div class="p-4 bg-light rounded-4 mb-4">
+                    <div class="row text-center position-relative">
+                        <div class="col-3">
+                            <div class="rounded-circle d-inline-flex p-3 @(isPending || isProcessing || isShipped || isDelivered ? "bg-primary text-white" : "bg-secondary text-white")">
+                                <i class="bi bi-receipt fs-4"></i>
+                            </div>
+                            <div class="small fw-bold mt-2">Pending</div>
+                        </div>
+                        <div class="col-3">
+                            <div class="rounded-circle d-inline-flex p-3 @(isProcessing || isShipped || isDelivered ? "bg-primary text-white" : "bg-light border text-muted")">
+                                <i class="bi bi-gear-wide-connected fs-4"></i>
+                            </div>
+                            <div class="small fw-bold mt-2">Processing</div>
+                        </div>
+                        <div class="col-3">
+                            <div class="rounded-circle d-inline-flex p-3 @(isShipped || isDelivered ? "bg-primary text-white" : "bg-light border text-muted")">
+                                <i class="bi bi-truck fs-4"></i>
+                            </div>
+                            <div class="small fw-bold mt-2">Shipped</div>
+                        </div>
+                        <div class="col-3">
+                            <div class="rounded-circle d-inline-flex p-3 @(isDelivered ? "bg-success text-white" : "bg-light border text-muted")">
+                                <i class="bi bi-check-circle-fill fs-4"></i>
+                            </div>
+                            <div class="small fw-bold mt-2">Delivered</div>
+                        </div>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-danger mb-4">
+                    <i class="bi bi-x-octagon-fill me-2"></i> This order was cancelled. Reserved inventory was restocked.
+                </div>
+            }
+
+            <h5 class="fw-bold mb-3">Items in this Order</h5>
+            <div class="table-responsive mb-4">
+                <table class="table align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Item</th>
+                            <th>Unit Price</th>
+                            <th>Quantity</th>
+                            <th class="text-end">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.Items)
+                        {
+                            <tr>
+                                <td class="fw-semibold">@item.ProductName</td>
+                                <td>$@item.UnitPrice.ToString("F2")</td>
+                                <td>@item.Quantity</td>
+                                <td class="text-end fw-bold">$@item.SubTotal.ToString("F2")</td>
+                            </tr>
+                        }
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="3" class="text-end fw-bold fs-5">Total Paid:</td>
+                            <td class="text-end fw-bold fs-5 text-primary">$@Model.TotalAmount.ToString("F2")</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center">
+                <a asp-action="Index" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left me-1"></i> Back to Orders
+                </a>
+                <a asp-controller="Home" asp-action="Index" class="btn btn-primary">
+                    Continue Shopping
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

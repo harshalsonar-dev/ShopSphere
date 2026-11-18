@@ -1,0 +1,59 @@
+@model ShopSphere.Application.Features.Products.Commands.UpdateProductCommand
+@{
+    ViewData["Title"] = $"Edit Product #{Model.Id}";
+    var categories = ViewBag.Categories as IReadOnlyList<CategoryDto> ?? new List<CategoryDto>();
+}
+
+<div class="row justify-content-center py-4">
+    <div class="col-lg-7">
+        <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5 bg-white">
+            <h3 class="fw-bold mb-1"><i class="bi bi-pencil-square text-primary me-2"></i>Edit Product #@Model.Id</h3>
+            <p class="text-muted mb-4">Modify details, price adjustments, or restock inventory.</p>
+
+            <form method="post" asp-action="EditProduct">
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="Id" />
+
+                <div class="mb-3">
+                    <label class="form-label small fw-semibold text-muted">Product Name</label>
+                    <input asp-for="Name" class="form-control" required />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label small fw-semibold text-muted">Category</label>
+                    <select asp-for="CategoryId" class="form-select" required>
+                        @foreach (var cat in categories)
+                        {
+                            <option value="@cat.Id" selected="@(Model.CategoryId == cat.Id ? "selected" : null)">@cat.Name</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label small fw-semibold text-muted">Price ($)</label>
+                        <input asp-for="Price" type="number" step="0.01" class="form-control" required />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small fw-semibold text-muted">Stock Quantity</label>
+                        <input asp-for="StockQuantity" type="number" class="form-control" required />
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label small fw-semibold text-muted">Description</label>
+                    <textarea asp-for="Description" class="form-control" rows="4"></textarea>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center">
+                    <a asp-action="Index" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left me-1"></i> Cancel
+                    </a>
+                    <button type="submit" class="btn btn-primary px-4 py-2 fw-semibold">
+                        <i class="bi bi-check2-circle me-1"></i> Update Product
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

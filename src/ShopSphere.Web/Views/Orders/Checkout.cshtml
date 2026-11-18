@@ -1,0 +1,67 @@
+@model CartDto
+@{
+    ViewData["Title"] = "Checkout Order";
+}
+
+<div class="row justify-content-center py-3">
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5 bg-white">
+            <h3 class="fw-bold mb-1"><i class="bi bi-credit-card-2-front text-primary me-2"></i>Review & Confirm Order</h3>
+            <p class="text-muted mb-4">Please confirm your items. Your inventory reservation and order will be processed immediately.</p>
+
+            <div class="table-responsive mb-4">
+                <table class="table align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Item</th>
+                            <th>Unit Price</th>
+                            <th>Qty</th>
+                            <th class="text-end">Subtotal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.Items)
+                        {
+                            <tr>
+                                <td>
+                                    <span class="fw-semibold">@item.ProductName</span>
+                                </td>
+                                <td>$@item.UnitPrice.ToString("F2")</td>
+                                <td>@item.Quantity</td>
+                                <td class="text-end fw-bold">$@item.SubTotal.ToString("F2")</td>
+                            </tr>
+                        }
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="3" class="text-end fw-bold fs-5">Total:</td>
+                            <td class="text-end fw-bold fs-5 text-primary">$@Model.TotalAmount.ToString("F2")</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+
+            <div class="bg-light p-3 rounded-3 mb-4">
+                <div class="d-flex align-items-center">
+                    <i class="bi bi-shield-check fs-3 text-success me-3"></i>
+                    <div>
+                        <h6 class="mb-0 fw-bold">Real-Time Inventory Guard</h6>
+                        <small class="text-muted">Stock quantities are deducted upon confirmation. If an item becomes unavailable, the checkout transaction safely rolls back.</small>
+                    </div>
+                </div>
+            </div>
+
+            <form method="post" asp-action="ConfirmCheckout">
+                @Html.AntiForgeryToken()
+                <div class="d-flex justify-content-between align-items-center">
+                    <a asp-controller="Cart" asp-action="Index" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left me-1"></i> Return to Cart
+                    </a>
+                    <button type="submit" class="btn btn-success px-4 py-2 fs-5 fw-bold shadow-sm">
+                        <i class="bi bi-bag-check-fill me-2"></i> Complete Order ($@Model.TotalAmount.ToString("F2"))
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
