@@ -13,6 +13,18 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddApplicationServices();
 builder.Services.AddInfrastructureServices(builder.Configuration);
 
+// Add CORS support for Single Page Applications (React, Vite, Vue, etc.)
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("FrontendCorsPolicy", policy =>
+    {
+        policy.SetIsOriginAllowed(origin => true)
+              .AllowAnyMethod()
+              .AllowAnyHeader()
+              .AllowCredentials();
+    });
+});
+
 // 2. Configure JWT Bearer Authentication & Cookie support
 var jwtSecret = builder.Configuration["JwtSettings:Secret"] 
     ?? "ShopSphere_Super_Secret_Key_For_Jwt_Authentication_2025_SecureKey!";
@@ -128,6 +140,8 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+
+app.UseCors("FrontendCorsPolicy");
 
 app.UseAuthentication();
 app.UseAuthorization();
