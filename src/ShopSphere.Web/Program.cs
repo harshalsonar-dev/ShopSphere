@@ -76,7 +76,6 @@ builder.Services.AddAuthorization(options =>
 
 // 4. Presentation Services (MVC Views + Controllers + Swagger)
 builder.Services.AddControllersWithViews();
-builder.Services.AddRazorPages();
 builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddSwaggerGen(c =>
@@ -149,6 +148,5 @@ app.UseAuthorization();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
-app.MapRazorPages();
 
 app.Run();
